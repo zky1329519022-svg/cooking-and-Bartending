@@ -1,4 +1,6 @@
-/* 导入高端字体 Outfit */
+/* ==========================================
+   1. 导入字体与全局变量定义
+   ========================================== */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
 
 :root {
@@ -36,7 +38,9 @@ body {
   background-attachment: fixed;
 }
 
-/* 头部导航区域 */
+/* ==========================================
+   2. 头部导航与标题
+   ========================================== */
 header {
   padding: 2.5rem 2rem 1.5rem 2rem;
   max-width: 1200px;
@@ -68,7 +72,9 @@ header {
   letter-spacing: 1px;
 }
 
-/* 主控制器区域（过滤分类 + 添加按钮） */
+/* ==========================================
+   3. 主控制器区域（过滤分类 + 添加按钮）
+   ========================================== */
 .controls-container {
   width: 100%;
   max-width: 1200px;
@@ -114,7 +120,6 @@ header {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 霓虹添加按钮 */
 .add-btn {
   background: linear-gradient(135deg, var(--accent-cooking) 0%, var(--accent-bartending) 100%);
   border: none;
@@ -143,7 +148,9 @@ header {
   stroke: currentColor;
 }
 
-/* 卡片网格展示区 */
+/* ==========================================
+   4. 卡片展示网格
+   ========================================== */
 .grid-section {
   max-width: 1200px;
   margin: 0 auto;
@@ -156,7 +163,6 @@ header {
   gap: 2rem;
 }
 
-/* 玻璃拟态卡片 */
 .item-card {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
@@ -175,7 +181,6 @@ header {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* 卡片不同类别的阴影光效 */
 .item-card.cooking:hover {
   box-shadow: 0 20px 40px var(--accent-cooking-glow), 0 0 1px var(--accent-cooking);
 }
@@ -202,7 +207,6 @@ header {
   transform: scale(1.06);
 }
 
-/* 标签样式 */
 .card-badge {
   position: absolute;
   top: 16px;
@@ -262,7 +266,6 @@ header {
   text-overflow: ellipsis;
 }
 
-/* 空状态 */
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
@@ -271,7 +274,9 @@ header {
   font-size: 1.1rem;
 }
 
-/* 模态框样式 */
+/* ==========================================
+   5. 模态框与表单
+   ========================================== */
 .modal {
   position: fixed;
   top: 0;
@@ -375,7 +380,6 @@ header {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* 文件上传区域 */
 .file-upload-wrapper {
   position: relative;
   width: 100%;
@@ -475,37 +479,65 @@ header {
   box-shadow: 0 6px 20px rgba(255, 42, 133, 0.4);
 }
 
-/* 响应式调整 */
+/* ==========================================
+   6. 极致手机端深度适配 (Media Queries 必须放最末尾以确保覆盖优先级)
+   ========================================== */
 @media (max-width: 768px) {
   header {
-    padding: 1.5rem 1rem 1rem 1rem;
+    padding: 2rem 1rem 1rem 1rem;
   }
   
   .logo-section h1 {
-    font-size: 2rem;
+    font-size: 2.1rem;
   }
   
-  .controls-container {
-    padding: 0 1rem 1.5rem 1rem;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .filter-tabs {
-    justify-content: center;
-  }
-  
-  .tab-btn {
-    padding: 8px 16px;
+  .logo-section p {
     font-size: 0.9rem;
   }
   
-  .add-btn {
+  /* 头部控制器布局优化：给底部悬浮按钮让路 */
+  .controls-container {
+    padding: 0 1rem 1.5rem 1rem;
     justify-content: center;
   }
   
+  .filter-tabs {
+    width: 100%;
+    justify-content: space-around;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  /* 手机端转化为：右下角极具质感的悬浮添加按钮 (Floating Action Button) */
+  .add-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 24px;
+    z-index: 99;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    padding: 0;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 30px rgba(255, 42, 133, 0.45);
+    /* 隐藏文字，只留加号图标 */
+    font-size: 0;
+  }
+  
+  .add-btn svg {
+    width: 24px;
+    height: 24px;
+    margin: 0;
+  }
+  
   .grid-section {
-    padding: 0 1rem 3rem 1rem;
+    padding: 0 1rem 5rem 1rem; /* 底部增加 padding 避免卡片内容被悬浮按钮遮挡 */
   }
   
   .cards-grid {
@@ -513,9 +545,43 @@ header {
     gap: 1.5rem;
   }
   
+  /* 手机端模态框优化：改用抽屉式底部滑出设计，防内容截断，支持平滑滚动 */
+  .modal {
+    align-items: flex-end;
+  }
+  
   .modal-content {
-    padding: 1.5rem;
-    border-radius: var(--border-radius-md);
-    margin: 1rem;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 2rem 1.5rem 3rem 1.5rem;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    border-bottom: none;
+    max-height: 88vh; /* 限制最大高度，留出顶部边缘以示仍是模态框 */
+    overflow-y: auto; /* 允许超出时在内部滚动 */
+    -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .modal.active .modal-content {
+    transform: translateY(0);
+  }
+  
+  .modal-close {
+    top: 20px;
+    right: 20px;
+  }
+  
+  /* 解决 iOS 浏览器上输入框字体小于 16px 导致聚焦自动放大的问题 */
+  .form-group input[type="text"],
+  .form-group textarea,
+  .form-group select {
+    font-size: 16px;
+    padding: 14px 16px; /* 适当增大触控大小 */
+  }
+  
+  .file-upload-wrapper {
+    height: 110px;
   }
 }
