@@ -266,29 +266,62 @@ function handleImageSelect(e) {
   }
 }
 
-// 将图片读取并转换为 Base64，限制大小以避免网络负担
+// 将图片读取并在前端进行高质量 Canvas 等比压缩，解除上传大小上限限制
 function handleImageFile(file) {
   if (!file.type.startsWith('image/')) {
     alert('请选择有效的图片文件');
     return;
   }
 
-  // 限制图片大小为 2MB
-  if (file.size > 2 * 1024 * 1024) {
-    alert('为了保证上传速度，图片大小请不要超过 2MB');
-    return;
-  }
+  // 显示临时优化提示
+  uploadText.textContent = '正在优化图片大小...';
 
   const reader = new FileReader();
   reader.onload = function(e) {
-    currentBase64Image = e.target.result;
-    
-    // 显示预览图，隐藏图标和文本说明
-    imagePreview.src = currentBase64Image;
-    imagePreview.style.display = 'block';
-    uploadText.style.display = 'none';
-    const icon = uploadWrapper.querySelector('.upload-icon');
-    if (icon) icon.style.display = 'none';
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      let width = img.width;
+      let height = img.height;
+
+      // 极致优化的最大边长限制（1600px，在视网膜屏幕及手机上展示依然完美高清）
+      const MAX_WIDTH = 1600;
+      const MAX_HEIGHT = 1600;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 前端质量压缩，使用 0.85 (85% JPEG 质量)，可在无损视觉的前提下，将 10MB 的图降至 300KB
+      currentBase64Image = canvas.toDataURL('image/jpeg', 0.85);
+
+      // 显示预览图，恢复文字及图标的隐藏
+      imagePreview.src = currentBase64Image;
+      imagePreview.style.display = 'block';
+      uploadText.style.display = 'none';
+      uploadText.textContent = '点击或拖拽上传图片'; // 还原文字
+      const icon = uploadWrapper.querySelector('.upload-icon');
+      if (icon) icon.style.display = 'none';
+    };
+    img.onerror = function() {
+      alert('加载图片失败，请重试');
+      resetImageUpload();
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
