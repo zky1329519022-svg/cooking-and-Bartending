@@ -834,6 +834,52 @@ body {
 }
 
 /* ==========================================
+   7.5. 品物详情模态框样式
+   ========================================== */
+.detail-img-wrapper {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  position: relative;
+}
+
+.detail-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-body {
+  padding: 2.5rem;
+}
+
+.detail-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.detail-description {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+  font-weight: 300;
+  white-space: pre-wrap;
+  margin-bottom: 2rem;
+}
+
+.detail-meta {
+  border-top: 1px solid var(--panel-border);
+  padding-top: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================
    8. 极致手机端深度适配 (Media Queries)
    ========================================== */
 @media (max-width: 768px) {
@@ -980,5 +1026,20 @@ body {
   .form-group select {
     font-size: 16px;
     padding: 14px 16px;
+  }
+
+  /* 移动端详情弹窗自适应微调 */
+  #detailModal .modal-content {
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    max-height: 92vh;
+  }
+  .detail-img-wrapper {
+    aspect-ratio: 16 / 11;
+  }
+  .detail-body {
+    padding: 2rem 1.5rem 2.5rem 1.5rem;
+  }
+  .detail-title {
+    font-size: 1.75rem;
   }
 }

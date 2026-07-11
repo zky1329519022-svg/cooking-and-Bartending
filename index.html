@@ -206,6 +206,31 @@
     </div>
   </div>
 
+  <!-- 品物详情模态框 (Detail Modal) -->
+  <div class="modal" id="detailModal">
+    <div class="modal-content" style="max-width: 600px; padding: 0; overflow: hidden;">
+      <button class="modal-close" id="closeDetailModalBtn" style="top: 16px; right: 16px; background: rgba(8, 6, 7, 0.5); color: #fff; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); display: flex; justify-content: center; align-items: center; z-index: 10;">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      
+      <div class="detail-img-wrapper">
+        <span class="card-badge" id="detailBadge"></span>
+        <img id="detailImage" src="" alt="食品饮料大图">
+      </div>
+      
+      <div class="detail-body">
+        <h2 class="detail-title" id="detailTitle"></h2>
+        <p class="detail-description" id="detailDescription"></p>
+        <div class="detail-meta">
+          <span id="detailCreator"></span>
+          <span id="detailDate"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

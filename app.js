@@ -2,23 +2,8 @@
 // 1. 静态初始预设数据
 // ==========================================
 
-// 自制（手作风味）预设数据
-const INITIAL_CREATION_ITEMS = [
-  {
-    id: 'default-creation-1',
-    name: '松露香煎 M9 和牛',
-    type: 'cooking',
-    description: '精选顶级 M9 级和牛，搭配新鲜黑松露切片。高温热锅两面快速煎香，锁住饱满肉汁，佐以红酒牛肉汁，入口即化，奶香浓郁。',
-    image: 'images/gourmet_dish.jpg'
-  },
-  {
-    id: 'default-creation-2',
-    name: '暮色极光 (Twilight Aurora)',
-    type: 'bartending',
-    description: '以金酒为基酒，注入手工酿制的蝶豆花糖浆与新鲜柠檬汁。杯口缀以迷迭香与干柠檬片，干冰烟雾缓缓升腾，营造出北欧极光般的渐变炫彩。',
-    image: 'images/cocktail_drink.jpg'
-  }
-];
+// 自制（手作风味）预设数据 (已按要求清空)
+const INITIAL_CREATION_ITEMS = [];
 
 // 品尝（探店寻味）预设数据
 const INITIAL_TASTING_ITEMS = [
@@ -80,6 +65,16 @@ const openAuthModalBtnHome = document.getElementById('openAuthModalBtnHome');
 const userInfoWrapperHome = document.getElementById('userInfoWrapperHome');
 const usernameDisplayHome = document.getElementById('usernameDisplayHome');
 const logoutBtnHome = document.getElementById('logoutBtnHome');
+
+// 详情模态框相关
+const detailModal = document.getElementById('detailModal');
+const closeDetailModalBtn = document.getElementById('closeDetailModalBtn');
+const detailBadge = document.getElementById('detailBadge');
+const detailImage = document.getElementById('detailImage');
+const detailTitle = document.getElementById('detailTitle');
+const detailDescription = document.getElementById('detailDescription');
+const detailCreator = document.getElementById('detailCreator');
+const detailDate = document.getElementById('detailDate');
 
 // ==========================================
 // 3. 状态变量
@@ -338,6 +333,12 @@ function setupEventListeners() {
   authForm.addEventListener('submit', handleAuthSubmit);
   addForm.addEventListener('submit', handleAddFormSubmit);
   cardsGrid.addEventListener('click', handleGridClick);
+
+  // 9. 详情模态框控制
+  closeDetailModalBtn.addEventListener('click', closeDetailModal);
+  detailModal.addEventListener('click', (e) => {
+    if (e.target === detailModal) closeDetailModal();
+  });
 }
 
 // ==========================================
@@ -557,12 +558,61 @@ async function handleAddFormSubmit(e) {
   }
 }
 
-// 删除品物品交互（带 category 参数）
+// 处理网格中的点击事件（代理卡片点击查看详情与删除卡片）
 async function handleGridClick(e) {
   const deleteBtn = e.target.closest('.card-delete-btn');
-  if (!deleteBtn) return;
+  if (deleteBtn) {
+    e.stopPropagation(); // 阻止事件冒泡，防止触发卡片点击进入详情
+    const itemId = deleteBtn.getAttribute('data-id');
+    handleDelete(itemId);
+    return;
+  }
 
-  const itemId = deleteBtn.getAttribute('data-id');
+  const card = e.target.closest('.item-card');
+  if (card) {
+    const itemId = card.getAttribute('data-id');
+    openDetailModal(itemId);
+  }
+}
+
+// 打开品物详情弹窗
+function openDetailModal(itemId) {
+  const presetItems = currentCategory === 'tastings' ? INITIAL_TASTING_ITEMS : INITIAL_CREATION_ITEMS;
+  const allItems = [...presetItems, ...customItems];
+  const item = allItems.find(i => i.id === itemId);
+
+  if (!item) return;
+
+  // 渲染填充详情
+  detailImage.src = item.image;
+  detailTitle.textContent = item.name;
+  detailDescription.textContent = item.description;
+
+  // 品味与分类角标
+  detailBadge.textContent = item.type === 'cooking' ? '美食' : '调酒';
+  detailBadge.className = 'card-badge'; // 还原基准类
+  if (item.type === 'cooking') {
+    detailBadge.classList.add('cooking');
+  } else {
+    detailBadge.classList.add('bartending');
+  }
+
+  // 元数据信息
+  detailCreator.textContent = item.createdBy ? `记录人: ${item.createdBy}` : '系统预设记录';
+  detailDate.textContent = item.createdAt ? `发布于: ${new Date(item.createdAt).toLocaleDateString()}` : '';
+
+  detailModal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+// 关闭品物详情弹窗
+function closeDetailModal() {
+  detailModal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// 提取的云端删除逻辑
+async function handleDelete(itemId) {
   if (!itemId) return;
 
   if (!confirm('确定要永久删除这道品物吗？该操作无法恢复。')) {
@@ -577,7 +627,6 @@ async function handleGridClick(e) {
   }
 
   try {
-    // 请求里加入 category 参数，以删除对应 KV 键值里的数据
     const res = await fetch(`/api/items?id=${itemId}&category=${currentCategory}`, {
       method: 'DELETE',
       headers: {
