@@ -1,4 +1,4 @@
-// 默认初始品物数据
+// 默认初始品物数据（只读的静态预设）
 const INITIAL_ITEMS = [
   {
     id: 'default-1',
@@ -29,39 +29,70 @@ const uploadWrapper = document.getElementById('uploadWrapper');
 const uploadText = document.getElementById('uploadText');
 const imagePreview = document.getElementById('imagePreview');
 
+// 登录注册 DOM 元素选择
+const openAuthModalBtn = document.getElementById('openAuthModalBtn');
+const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
+const authModal = document.getElementById('authModal');
+const authForm = document.getElementById('authForm');
+const authSwitchBtn = document.getElementById('authSwitchBtn');
+const authSubmitBtn = document.getElementById('authSubmitBtn');
+const authModalTitle = document.getElementById('authModalTitle');
+const userInfoWrapper = document.getElementById('userInfoWrapper');
+const usernameDisplay = document.getElementById('usernameDisplay');
+const logoutBtn = document.getElementById('logoutBtn');
+
 // 状态变量
 let currentFilter = 'all';
-let customItems = [];
+let customItems = []; // 存云端自定义数据
 let currentBase64Image = '';
+let authAction = 'login'; // login 或 register
 
 // 初始化函数
 function init() {
-  loadCustomItems();
-  renderCards();
+  checkLoginState();
+  fetchCloudItems();
   setupEventListeners();
 }
 
-// 从本地存储加载自定义品物
-function loadCustomItems() {
-  const stored = localStorage.getItem('gourmet_mixology_items');
-  if (stored) {
-    try {
-      customItems = JSON.parse(stored);
-    } catch (e) {
-      console.error('解析本地存储失败，清空本地存储', e);
-      customItems = [];
-    }
+// 检查并更新登录状态 UI
+function checkLoginState() {
+  const token = localStorage.getItem('gourmet_auth_token');
+  const username = localStorage.getItem('gourmet_username');
+
+  if (token && username) {
+    // 登录状态
+    openAuthModalBtn.style.display = 'none';
+    userInfoWrapper.style.display = 'flex';
+    usernameDisplay.textContent = username;
+    openModalBtn.style.display = 'flex'; // 显示添加按钮
+  } else {
+    // 未登录状态
+    openAuthModalBtn.style.display = 'block';
+    userInfoWrapper.style.display = 'none';
+    usernameDisplay.textContent = '';
+    openModalBtn.style.display = 'none'; // 隐藏添加按钮
   }
 }
 
-// 保存自定义品物到本地存储
-function saveCustomItems() {
-  localStorage.setItem('gourmet_mixology_items', JSON.stringify(customItems));
+// 从 Cloudflare KV 异步拉取云端自定义品物
+async function fetchCloudItems() {
+  try {
+    const res = await fetch('/api/items');
+    if (!res.ok) throw new Error('拉取数据失败');
+    
+    const data = await res.json();
+    if (data.success) {
+      customItems = data.items || [];
+      renderCards();
+    }
+  } catch (error) {
+    console.error('拉取云端数据发生错误:', error);
+  }
 }
 
 // 动态渲染品物卡片
 function renderCards() {
-  // 合并默认数据与自定义数据
+  // 合并默认数据与云端自定义数据
   const allItems = [...INITIAL_ITEMS, ...customItems];
   
   // 过滤数据
@@ -76,7 +107,7 @@ function renderCards() {
   if (filteredItems.length === 0) {
     cardsGrid.innerHTML = `
       <div class="empty-state">
-        <p>暂无此类别的品物，点击右上角开始添加吧！</p>
+        <p>暂无此类别的品物，管理员登录后即可添加新内容！</p>
       </div>
     `;
     return;
@@ -89,6 +120,7 @@ function renderCards() {
     card.setAttribute('data-id', item.id);
 
     const typeLabel = item.type === 'cooking' ? '美食' : '调酒';
+    const creatorText = item.createdBy ? `<small style="display:block;margin-top:6px;font-size:0.75rem;color:var(--text-muted);">发布者: ${item.createdBy}</small>` : '';
 
     card.innerHTML = `
       <div class="card-img-wrapper">
@@ -98,6 +130,7 @@ function renderCards() {
       <div class="card-body">
         <h3 class="card-title">${item.name}</h3>
         <p class="card-description">${item.description}</p>
+        ${creatorText}
       </div>
     `;
 
@@ -117,22 +150,42 @@ function setupEventListeners() {
     });
   });
 
-  // 2. 模态框打开与关闭
-  openModalBtn.addEventListener('click', openModal);
-  closeModalBtn.addEventListener('click', closeModal);
-  cancelBtn.addEventListener('click', closeModal);
-  
-  // 点击模态框背景关闭
+  // 2. 添加品物模态框控制
+  openModalBtn.addEventListener('click', openAddModal);
+  closeModalBtn.addEventListener('click', closeAddModal);
+  cancelBtn.addEventListener('click', closeAddModal);
   addModal.addEventListener('click', (e) => {
-    if (e.target === addModal) {
-      closeModal();
+    if (e.target === addModal) closeAddModal();
+  });
+
+  // 3. 登录注册模态框控制
+  openAuthModalBtn.addEventListener('click', openAuthModal);
+  closeAuthModalBtn.addEventListener('click', closeAuthModal);
+  authModal.addEventListener('click', (e) => {
+    if (e.target === authModal) closeAuthModal();
+  });
+
+  // 4. 登录/注册模式切换
+  authSwitchBtn.addEventListener('click', () => {
+    if (authAction === 'login') {
+      authAction = 'register';
+      authModalTitle.textContent = '创建管理员账号';
+      authSubmitBtn.textContent = '立即注册';
+      authSwitchBtn.textContent = '切换到登录';
+    } else {
+      authAction = 'login';
+      authModalTitle.textContent = '管理员登录';
+      authSubmitBtn.textContent = '立即登录';
+      authSwitchBtn.textContent = '切换到注册';
     }
   });
 
-  // 3. 图片文件拖拽与选择上传
-  itemImageInput.addEventListener('change', handleImageSelect);
+  // 5. 退出登录
+  logoutBtn.addEventListener('click', handleLogout);
 
-  // 拖拽高亮处理
+  // 6. 图片文件选择与拖拽
+  itemImageInput.addEventListener('change', handleImageSelect);
+  
   uploadWrapper.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadWrapper.style.borderColor = 'rgba(255, 255, 255, 0.4)';
@@ -155,22 +208,45 @@ function setupEventListeners() {
     }
   });
 
-  // 4. 表单提交
-  addForm.addEventListener('submit', handleFormSubmit);
+  // 7. 表单提交
+  authForm.addEventListener('submit', handleAuthSubmit);
+  addForm.addEventListener('submit', handleAddFormSubmit);
 }
 
-// 开启模态框
-function openModal() {
+// 模态框打开/关闭辅助
+function openAddModal() {
   addModal.classList.add('active');
-  document.body.style.overflow = 'hidden'; // 阻止背景滚动
+  document.body.style.overflow = 'hidden';
 }
 
-// 关闭模态框并重置表单
-function closeModal() {
+function closeAddModal() {
   addModal.classList.remove('active');
   document.body.style.overflow = '';
   addForm.reset();
   resetImageUpload();
+}
+
+function openAuthModal() {
+  authAction = 'login';
+  authModalTitle.textContent = '管理员登录';
+  authSubmitBtn.textContent = '立即登录';
+  authSwitchBtn.textContent = '切换到注册';
+  authModal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuthModal() {
+  authModal.classList.remove('active');
+  document.body.style.overflow = '';
+  authForm.reset();
+}
+
+// 退出登录
+function handleLogout() {
+  localStorage.removeItem('gourmet_auth_token');
+  localStorage.removeItem('gourmet_username');
+  checkLoginState();
+  alert('您已退出登录');
 }
 
 // 重置图片上传预览
@@ -190,16 +266,16 @@ function handleImageSelect(e) {
   }
 }
 
-// 将图片读取并转换为 Base64
+// 将图片读取并转换为 Base64，限制大小以避免网络负担
 function handleImageFile(file) {
   if (!file.type.startsWith('image/')) {
     alert('请选择有效的图片文件');
     return;
   }
 
-  // 限制图片大小为 2MB 以防止 localStorage 超限
+  // 限制图片大小为 2MB
   if (file.size > 2 * 1024 * 1024) {
-    alert('为了保证页面性能，图片大小请不要超过 2MB');
+    alert('为了保证上传速度，图片大小请不要超过 2MB');
     return;
   }
 
@@ -207,7 +283,7 @@ function handleImageFile(file) {
   reader.onload = function(e) {
     currentBase64Image = e.target.result;
     
-    // 显示预览图，隐藏图标和文字说明
+    // 显示预览图，隐藏图标和文本说明
     imagePreview.src = currentBase64Image;
     imagePreview.style.display = 'block';
     uploadText.style.display = 'none';
@@ -217,9 +293,63 @@ function handleImageFile(file) {
   reader.readAsDataURL(file);
 }
 
-// 处理表单提交并添加新项目
-function handleFormSubmit(e) {
+// 处理登录与注册的提交
+async function handleAuthSubmit(e) {
   e.preventDefault();
+  
+  const username = document.getElementById('authUsername').value.trim();
+  const password = document.getElementById('authPassword').value;
+
+  try {
+    const res = await fetch(`/api/auth?action=${authAction}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+    
+    if (!res.ok || !data.success) {
+      alert(data.message || '操作失败');
+      return;
+    }
+
+    if (authAction === 'register') {
+      alert(data.message || '注册成功！已切换到登录界面，请输入刚才注册的账户密码。');
+      authAction = 'login';
+      authModalTitle.textContent = '管理员登录';
+      authSubmitBtn.textContent = '立即登录';
+      authSwitchBtn.textContent = '切换到注册';
+      document.getElementById('authPassword').value = '';
+    } else {
+      // 登录成功
+      localStorage.setItem('gourmet_auth_token', data.token);
+      localStorage.setItem('gourmet_username', data.username);
+      checkLoginState();
+      closeAuthModal();
+      alert('登录成功！您现在可以添加和发布美食调酒了。');
+      // 登录后重新拉取最新列表
+      fetchCloudItems();
+    }
+
+  } catch (error) {
+    alert(`网络请求发生错误: ${error.message}`);
+  }
+}
+
+// 处理添加卡片提交（发送到云端 KV）
+async function handleAddFormSubmit(e) {
+  e.preventDefault();
+
+  const token = localStorage.getItem('gourmet_auth_token');
+  if (!token) {
+    alert('登录已失效，请重新登录后再试');
+    checkLoginState();
+    closeAddModal();
+    return;
+  }
 
   const type = document.getElementById('itemType').value;
   const name = document.getElementById('itemName').value.trim();
@@ -230,21 +360,47 @@ function handleFormSubmit(e) {
     return;
   }
 
-  const newItem = {
-    id: 'custom-' + Date.now(),
-    name,
-    type,
-    description,
-    image: currentBase64Image
-  };
+  try {
+    const res = await fetch('/api/items', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name,
+        type,
+        description,
+        image: currentBase64Image
+      })
+    });
 
-  // 添加到自定义列表首位以在渲染时靠前显示
-  customItems.unshift(newItem);
-  saveCustomItems();
-  
-  // 重新渲染卡片并关闭模态框
-  renderCards();
-  closeModal();
+    const data = await res.json();
+
+    if (res.status === 401) {
+      alert('登录状态已失效，请重新登录');
+      localStorage.removeItem('gourmet_auth_token');
+      localStorage.removeItem('gourmet_username');
+      checkLoginState();
+      closeAddModal();
+      return;
+    }
+
+    if (!res.ok || !data.success) {
+      alert(data.message || '发布失败');
+      return;
+    }
+
+    alert('发布成功！内容已实时同步至云端。');
+    
+    // 把新项目塞进当前列表首位并渲染
+    customItems.unshift(data.item);
+    renderCards();
+    closeAddModal();
+
+  } catch (error) {
+    alert(`发布数据失败，网络异常: ${error.message}`);
+  }
 }
 
 // 页面加载完成后启动

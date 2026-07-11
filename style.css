@@ -479,6 +479,72 @@ header {
   box-shadow: 0 6px 20px rgba(255, 42, 133, 0.4);
 }
 
+/* 用户状态栏与登录组件样式 */
+.user-status-bar {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.auth-trigger-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text-main);
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  font-family: inherit;
+  backdrop-filter: var(--glass-blur);
+}
+
+.auth-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.user-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 4px 6px 4px 16px;
+  border-radius: 30px;
+  border: 1px solid var(--panel-border);
+  backdrop-filter: var(--glass-blur);
+}
+
+.username-display {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.logout-btn {
+  background: rgba(255, 42, 133, 0.1);
+  border: 1px solid rgba(255, 42, 133, 0.2);
+  color: #ff5e97;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  font-family: inherit;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 42, 133, 0.2);
+  border-color: rgba(255, 42, 133, 0.4);
+  color: #ff7da9;
+}
+
 /* ==========================================
    6. 极致手机端深度适配 (Media Queries 必须放最末尾以确保覆盖优先级)
    ========================================== */
@@ -583,5 +649,14 @@ header {
   
   .file-upload-wrapper {
     height: 110px;
+  }
+  
+  /* 移动端用户状态栏微调 */
+  .user-status-bar {
+    position: static;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+    width: 100%;
+    order: -1; /* 在 Flexbox 中使其排在标题最上方 */
   }
 }
