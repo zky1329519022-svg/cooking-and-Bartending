@@ -437,6 +437,63 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* ==========================================
+   5.5. 二级分类选项卡（风味饮料细分）
+   ========================================== */
+.tabs-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.sub-filter-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 4px;
+  border-radius: 30px;
+  gap: 4px;
+  backdrop-filter: var(--glass-blur);
+  opacity: 0;
+  transform: translateY(-8px);
+  max-height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sub-filter-tabs.active {
+  opacity: 1;
+  transform: translateY(0);
+  max-height: 50px;
+  pointer-events: auto;
+  margin-top: 2px;
+}
+
+.sub-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 6px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  font-family: inherit;
+}
+
+.sub-tab-btn:hover {
+  color: var(--text-main);
+}
+
+.sub-tab-btn.active {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-main);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* 霓虹添加按钮 (随分类改变发光) */
 .add-btn {
   background: linear-gradient(135deg, var(--accent-cooking) 0%, var(--accent-bartending) 100%);
@@ -500,11 +557,15 @@ body {
 }
 
 /* 卡片不同类别的阴影光效 */
-.item-card.cooking:hover {
+.item-card.food:hover {
   box-shadow: 0 20px 40px var(--accent-cooking-glow), 0 0 1px var(--accent-cooking);
 }
 
-.item-card.bartending:hover {
+.item-card.non-alcoholic:hover {
+  box-shadow: 0 20px 40px rgba(26, 188, 156, 0.18), 0 0 1px #1abc9c;
+}
+
+.item-card.alcoholic:hover {
   box-shadow: 0 20px 40px var(--accent-bartending-glow), 0 0 1px var(--accent-bartending);
 }
 
@@ -541,12 +602,17 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.cooking .card-badge {
+.food .card-badge {
   background: rgba(230, 126, 34, 0.25);
   text-shadow: 0 0 8px var(--accent-cooking);
 }
 
-.bartending .card-badge {
+.non-alcoholic .card-badge {
+  background: rgba(26, 188, 156, 0.25);
+  text-shadow: 0 0 8px #1abc9c;
+}
+
+.alcoholic .card-badge {
   background: rgba(212, 175, 55, 0.25);
   text-shadow: 0 0 8px var(--accent-bartending);
 }
@@ -567,11 +633,15 @@ body {
   transition: var(--transition-smooth);
 }
 
-.cooking:hover .card-title {
+.food:hover .card-title {
   color: var(--accent-cooking);
 }
 
-.bartending:hover .card-title {
+.non-alcoholic:hover .card-title {
+  color: #1abc9c;
+}
+
+.alcoholic:hover .card-title {
   color: var(--accent-bartending);
 }
 
@@ -962,6 +1032,24 @@ body {
     text-align: center;
     padding: 8px 10px;
     font-size: 0.85rem;
+  }
+
+  /* 移动端二级分类 Tabs */
+  .tabs-wrapper {
+    width: 100%;
+    align-items: center;
+  }
+
+  .sub-filter-tabs {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .sub-tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 6px 8px;
+    font-size: 0.8rem;
   }
 
   .add-btn {

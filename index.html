@@ -95,10 +95,17 @@
 
     <!-- 控制器区域：分类与添加按钮 -->
     <div class="controls-container">
-      <div class="filter-tabs">
-        <button class="tab-btn active" data-filter="all">全部品类</button>
-        <button class="tab-btn" data-filter="cooking">精选美食</button>
-        <button class="tab-btn" data-filter="bartending">创意调酒</button>
+      <div class="tabs-wrapper">
+        <div class="filter-tabs">
+          <button class="tab-btn active" data-filter="all">全部品类</button>
+          <button class="tab-btn" data-filter="food">精选美食</button>
+          <button class="tab-btn" data-filter="drinks">风味饮料</button>
+        </div>
+        <div class="sub-filter-tabs" id="drinksSubTabs">
+          <button class="sub-tab-btn active" data-subfilter="drinks-all">全部饮料</button>
+          <button class="sub-tab-btn" data-subfilter="non-alcoholic">无酒精饮料</button>
+          <button class="sub-tab-btn" data-subfilter="alcoholic">含酒精饮料</button>
+        </div>
       </div>
       
       <!-- 仅在登录后显示的添加按钮 -->
@@ -134,8 +141,9 @@
         <div class="form-group">
           <label for="itemType">分类类别</label>
           <select id="itemType" required>
-            <option value="cooking">精选美食 (Cooking)</option>
-            <option value="bartending">创意调酒 (Bartending)</option>
+            <option value="food">精选美食 (Food)</option>
+            <option value="non-alcoholic">无酒精饮料 (Non-Alcoholic)</option>
+            <option value="alcoholic">含酒精饮料 (Alcoholic)</option>
           </select>
         </div>
         

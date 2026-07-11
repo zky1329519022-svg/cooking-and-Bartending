@@ -30,6 +30,8 @@ const addModalTitle = document.getElementById('addModalTitle');
 // 品物网格与控制器
 const cardsGrid = document.getElementById('cardsGrid');
 const filterBtns = document.querySelectorAll('.tab-btn');
+const drinksSubTabs = document.getElementById('drinksSubTabs');
+const subTabBtns = document.querySelectorAll('.sub-tab-btn');
 const openModalBtn = document.getElementById('openModalBtn');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const cancelBtn = document.getElementById('cancelBtn');
@@ -72,7 +74,8 @@ const detailDate = document.getElementById('detailDate');
 // 3. 状态变量
 // ==========================================
 let currentCategory = 'creations'; // creations = 手作风味, tastings = 探店寻味
-let currentFilter = 'all';        // all, cooking, bartending
+let currentFilter = 'all';        // all, food, drinks
+let currentSubFilter = 'drinks-all'; // drinks-all, non-alcoholic, alcoholic
 let customItems = [];             // 存储拉取下来的云端自定义数据
 let currentBase64Image = '';
 let authAction = 'login';         // login 或 register
@@ -123,9 +126,15 @@ function switchView(viewName, category = 'creations') {
     homeView.classList.add('active');
     // 返回首页重置过滤状态
     currentFilter = 'all';
+    currentSubFilter = 'drinks-all';
+    drinksSubTabs.classList.remove('active');
     filterBtns.forEach(btn => {
       btn.classList.remove('active');
       if (btn.getAttribute('data-filter') === 'all') btn.classList.add('active');
+    });
+    subTabBtns.forEach(sb => {
+      sb.classList.remove('active');
+      if (sb.getAttribute('data-subfilter') === 'drinks-all') sb.classList.add('active');
     });
   } else if (viewName === 'list') {
     currentCategory = category;
@@ -188,10 +197,19 @@ function renderCards() {
   const presetItems = currentCategory === 'tastings' ? INITIAL_TASTING_ITEMS : INITIAL_CREATION_ITEMS;
   const allItems = [...presetItems, ...customItems];
   
-  // 美食/调酒分类过滤
+  // 一级与二级联动分类过滤
   const filteredItems = allItems.filter(item => {
+    // 兼容历史 cooking/bartending 字段，转换为新数据
+    const resolvedType = item.type === 'cooking' ? 'food' : (item.type === 'bartending' ? 'alcoholic' : item.type);
+    
     if (currentFilter === 'all') return true;
-    return item.type === currentFilter;
+    if (currentFilter === 'food') return resolvedType === 'food';
+    if (currentFilter === 'drinks') {
+      if (resolvedType !== 'non-alcoholic' && resolvedType !== 'alcoholic') return false;
+      if (currentSubFilter === 'drinks-all') return true;
+      return resolvedType === currentSubFilter;
+    }
+    return true;
   });
 
   cardsGrid.innerHTML = '';
@@ -208,10 +226,15 @@ function renderCards() {
   // 渲染卡片
   filteredItems.forEach(item => {
     const card = document.createElement('div');
-    card.className = `item-card ${item.type}`;
+    // 同样做类型映射兼容
+    const resolvedType = item.type === 'cooking' ? 'food' : (item.type === 'bartending' ? 'alcoholic' : item.type);
+    card.className = `item-card ${resolvedType}`;
     card.setAttribute('data-id', item.id);
 
-    const typeLabel = item.type === 'cooking' ? '美食' : '调酒';
+    let typeLabel = '美食';
+    if (resolvedType === 'non-alcoholic') typeLabel = '饮料 · 无酒精';
+    if (resolvedType === 'alcoholic') typeLabel = '饮料 · 含酒精';
+
     const creatorText = item.createdBy ? `<small style="display:block;margin-top:6px;font-size:0.75rem;color:var(--text-muted);">记录人: ${item.createdBy}</small>` : '';
 
     // 判断该卡片是否为自定义内容，且管理员已登录，才显示删除按钮
@@ -251,12 +274,33 @@ function setupEventListeners() {
   enterTastingsBtn.addEventListener('click', () => switchView('list', 'tastings'));
   backToHomeBtn.addEventListener('click', () => switchView('home'));
 
-  // 2. 子页面分类选项卡切换
+  // 2. 子页面分类选项卡切换 (含二级饮料选项卡联动)
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       currentFilter = btn.getAttribute('data-filter');
+      
+      if (currentFilter === 'drinks') {
+        drinksSubTabs.classList.add('active');
+      } else {
+        drinksSubTabs.classList.remove('active');
+        currentSubFilter = 'drinks-all';
+        subTabBtns.forEach(sb => {
+          sb.classList.remove('active');
+          if (sb.getAttribute('data-subfilter') === 'drinks-all') sb.classList.add('active');
+        });
+      }
+      renderCards();
+    });
+  });
+
+  // 2.5 二级饮料细分选项卡切换
+  subTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      subTabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSubFilter = btn.getAttribute('data-subfilter');
       renderCards();
     });
   });
@@ -580,13 +624,20 @@ function openDetailModal(itemId) {
   detailTitle.textContent = item.name;
   detailDescription.textContent = item.description;
 
-  // 品味与分类角标
-  detailBadge.textContent = item.type === 'cooking' ? '美食' : '调酒';
+  // 品味与分类角标 (兼容历史 cooking/bartending 字段映射)
+  const resolvedType = item.type === 'cooking' ? 'food' : (item.type === 'bartending' ? 'alcoholic' : item.type);
+  let typeLabel = '美食';
+  if (resolvedType === 'non-alcoholic') typeLabel = '饮料 · 无酒精';
+  if (resolvedType === 'alcoholic') typeLabel = '饮料 · 含酒精';
+
+  detailBadge.textContent = typeLabel;
   detailBadge.className = 'card-badge'; // 还原基准类
-  if (item.type === 'cooking') {
-    detailBadge.classList.add('cooking');
+  if (resolvedType === 'food') {
+    detailBadge.classList.add('food');
+  } else if (resolvedType === 'non-alcoholic') {
+    detailBadge.classList.add('non-alcoholic');
   } else {
-    detailBadge.classList.add('bartending');
+    detailBadge.classList.add('alcoholic');
   }
 
   // 元数据信息
