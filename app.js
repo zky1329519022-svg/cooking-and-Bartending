@@ -67,7 +67,6 @@ const detailBadge = document.getElementById('detailBadge');
 const detailImage = document.getElementById('detailImage');
 const detailTitle = document.getElementById('detailTitle');
 const detailDescription = document.getElementById('detailDescription');
-const detailCreator = document.getElementById('detailCreator');
 const detailDate = document.getElementById('detailDate');
 
 // ==========================================
@@ -234,8 +233,6 @@ function renderCards() {
     if (resolvedType === 'non-alcoholic') typeLabel = '饮料 · 无酒精';
     if (resolvedType === 'alcoholic') typeLabel = '饮料 · 含酒精';
 
-    const creatorText = item.createdBy ? `<small style="display:block;margin-top:6px;font-size:0.75rem;color:var(--text-muted);">记录人: ${item.createdBy}</small>` : '';
-
     // 判断该卡片是否为自定义内容，且管理员已登录，才显示删除按钮
     const isCustom = item.id.startsWith('custom-');
     const token = localStorage.getItem('gourmet_auth_token');
@@ -256,7 +253,6 @@ function renderCards() {
       <div class="card-body">
         <h3 class="card-title">${item.name}</h3>
         <p class="card-description">${item.description}</p>
-        ${creatorText}
       </div>
     `;
 
@@ -618,7 +614,6 @@ function openDetailModal(itemId) {
   }
 
   // 元数据信息
-  detailCreator.textContent = item.createdBy ? `记录人: ${item.createdBy}` : '系统预设记录';
   detailDate.textContent = item.createdAt ? `发布于: ${new Date(item.createdAt).toLocaleDateString()}` : '';
 
   detailModal.classList.add('active');
