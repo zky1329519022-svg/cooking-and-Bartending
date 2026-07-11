@@ -47,7 +47,7 @@ const openAuthModalBtn = document.getElementById('openAuthModalBtn');
 const closeAuthModalBtn = document.getElementById('closeAuthModalBtn');
 const authModal = document.getElementById('authModal');
 const authForm = document.getElementById('authForm');
-const authSwitchBtn = document.getElementById('authSwitchBtn');
+const authKeyInput = document.getElementById('authKey');
 const authSubmitBtn = document.getElementById('authSubmitBtn');
 const authModalTitle = document.getElementById('authModalTitle');
 const userInfoWrapper = document.getElementById('userInfoWrapper');
@@ -78,7 +78,6 @@ let currentFilter = 'all';        // all, food, drinks
 let currentSubFilter = 'drinks-all'; // drinks-all, non-alcoholic, alcoholic
 let customItems = [];             // 存储拉取下来的云端自定义数据
 let currentBase64Image = '';
-let authAction = 'login';         // login 或 register
 
 // ==========================================
 // 4. 初始化与状态同步
@@ -321,21 +320,6 @@ function setupEventListeners() {
     if (e.target === authModal) closeAuthModal();
   });
 
-  // 5. 登录/注册模式切换
-  authSwitchBtn.addEventListener('click', () => {
-    if (authAction === 'login') {
-      authAction = 'register';
-      authModalTitle.textContent = '创建管理员账号';
-      authSubmitBtn.textContent = '立即注册';
-      authSwitchBtn.textContent = '切换到登录';
-    } else {
-      authAction = 'login';
-      authModalTitle.textContent = '管理员登录';
-      authSubmitBtn.textContent = '立即登录';
-      authSwitchBtn.textContent = '切换到注册';
-    }
-  });
-
   // 6. 退出登录（子页面版 & 首页版）
   logoutBtn.addEventListener('click', handleLogout);
   logoutBtnHome.addEventListener('click', handleLogout);
@@ -394,10 +378,8 @@ function closeAddModal() {
 }
 
 function openAuthModal() {
-  authAction = 'login';
-  authModalTitle.textContent = '管理员登录';
-  authSubmitBtn.textContent = '立即登录';
-  authSwitchBtn.textContent = '切换到注册';
+  authModalTitle.textContent = '管理员验证登录';
+  authSubmitBtn.textContent = '确认验证';
   authModal.classList.add('active');
   document.body.style.overflow = 'hidden';
 }
@@ -486,45 +468,40 @@ function handleImageFile(file) {
   reader.readAsDataURL(file);
 }
 
-// 登录注册提交
+// 管理员验证密钥提交
 async function handleAuthSubmit(e) {
   e.preventDefault();
   
-  const username = document.getElementById('authUsername').value.trim();
-  const password = document.getElementById('authPassword').value;
+  const key = authKeyInput.value.trim();
+
+  if (!key) {
+    alert('请输入验证密钥');
+    return;
+  }
 
   try {
-    const res = await fetch(`/api/auth?action=${authAction}`, {
+    const res = await fetch('/api/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ key })
     });
 
     const data = await res.json();
     
     if (!res.ok || !data.success) {
-      alert(data.message || '操作失败');
+      alert(data.message || '验证失败');
       return;
     }
 
-    if (authAction === 'register') {
-      alert(data.message || '注册成功！已切换到登录界面。');
-      authAction = 'login';
-      authModalTitle.textContent = '管理员登录';
-      authSubmitBtn.textContent = '立即登录';
-      authSwitchBtn.textContent = '切换到注册';
-      document.getElementById('authPassword').value = '';
-    } else {
-      localStorage.setItem('gourmet_auth_token', data.token);
-      localStorage.setItem('gourmet_username', data.username);
-      checkLoginState();
-      closeAuthModal();
-      alert('登录成功！已解锁数据管理功能。');
-      
-      // 若处于列表视口中，刷新该分类列表
-      if (listView.classList.contains('active')) {
-        fetchCloudItems(currentCategory);
-      }
+    localStorage.setItem('gourmet_auth_token', data.token);
+    localStorage.setItem('gourmet_username', data.username);
+    checkLoginState();
+    closeAuthModal();
+    alert('验证登录成功！已解锁数据管理功能。');
+    
+    // 若处于列表视口中，刷新该分类列表
+    if (listView.classList.contains('active')) {
+      fetchCloudItems(currentCategory);
     }
   } catch (error) {
     alert(`网络请求错误: ${error.message}`);

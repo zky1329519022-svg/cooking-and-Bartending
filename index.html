@@ -190,25 +190,18 @@
         </svg>
       </button>
       
-      <h2 id="authModalTitle">管理员登录</h2>
+      <h2 id="authModalTitle">管理员验证登录</h2>
       
       <form id="authForm">
-        <!-- 用户名 -->
+        <!-- 密钥验证 -->
         <div class="form-group">
-          <label for="authUsername">用户名</label>
-          <input type="text" id="authUsername" placeholder="请输入用户名" required autocomplete="username">
+          <label for="authKey">管理密钥 (Secret Key)</label>
+          <input type="password" id="authKey" placeholder="请输入管理员验证密钥" required autocomplete="current-password" style="width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--border-radius-md); padding: 12px 16px; color: var(--text-main); font-family: inherit; font-size: 0.95rem; transition: var(--transition-smooth); -webkit-text-security: disc;">
         </div>
         
-        <!-- 密码 -->
-        <div class="form-group">
-          <label for="authPassword">密码</label>
-          <input type="password" id="authPassword" placeholder="请输入密码" required autocomplete="current-password" style="width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: var(--border-radius-md); padding: 12px 16px; color: var(--text-main); font-family: inherit; font-size: 0.95rem; transition: var(--transition-smooth); -webkit-text-security: disc;">
-        </div>
-        
-        <!-- 切换及提交 -->
+        <!-- 提交验证 -->
         <div class="form-actions">
-          <button type="button" class="btn-secondary" id="authSwitchBtn">切换到注册</button>
-          <button type="submit" class="btn-primary" id="authSubmitBtn">立即登录</button>
+          <button type="submit" class="btn-primary" id="authSubmitBtn" style="flex: 1;">确认验证</button>
         </div>
       </form>
     </div>
