@@ -113,6 +113,9 @@ function renderCards() {
     return;
   }
 
+  // 检查是否登录以决定是否渲染删除按钮
+  const token = localStorage.getItem('gourmet_auth_token');
+
   // 渲染卡片
   filteredItems.forEach(item => {
     const card = document.createElement('div');
@@ -122,10 +125,21 @@ function renderCards() {
     const typeLabel = item.type === 'cooking' ? '美食' : '调酒';
     const creatorText = item.createdBy ? `<small style="display:block;margin-top:6px;font-size:0.75rem;color:var(--text-muted);">发布者: ${item.createdBy}</small>` : '';
 
+    // 自定义卡片且已登录，渲染删除按钮
+    const isCustom = item.id.startsWith('custom-');
+    const deleteBtnHtml = (token && isCustom) ? `
+      <button class="card-delete-btn" data-id="${item.id}" title="删除此品物">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </button>
+    ` : '';
+
     card.innerHTML = `
       <div class="card-img-wrapper">
         <span class="card-badge">${typeLabel}</span>
         <img src="${item.image}" alt="${item.name}" loading="lazy">
+        ${deleteBtnHtml}
       </div>
       <div class="card-body">
         <h3 class="card-title">${item.name}</h3>
@@ -208,9 +222,10 @@ function setupEventListeners() {
     }
   });
 
-  // 7. 表单提交
+  // 7. 表单提交与网格点击代理
   authForm.addEventListener('submit', handleAuthSubmit);
   addForm.addEventListener('submit', handleAddFormSubmit);
+  cardsGrid.addEventListener('click', handleGridClick);
 }
 
 // 模态框打开/关闭辅助
@@ -433,6 +448,59 @@ async function handleAddFormSubmit(e) {
 
   } catch (error) {
     alert(`发布数据失败，网络异常: ${error.message}`);
+  }
+}
+
+// 处理网格中的点击事件（主要用于删除卡片）
+async function handleGridClick(e) {
+  const deleteBtn = e.target.closest('.card-delete-btn');
+  if (!deleteBtn) return;
+
+  const itemId = deleteBtn.getAttribute('data-id');
+  if (!itemId) return;
+
+  if (!confirm('确定要永久删除这道品物吗？该操作无法恢复。')) {
+    return;
+  }
+
+  const token = localStorage.getItem('gourmet_auth_token');
+  if (!token) {
+    alert('登录已失效，请重新登录');
+    checkLoginState();
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/items?id=${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (res.status === 401) {
+      alert('登录已失效，请重新登录');
+      localStorage.removeItem('gourmet_auth_token');
+      localStorage.removeItem('gourmet_username');
+      checkLoginState();
+      return;
+    }
+
+    if (!res.ok || !data.success) {
+      alert(data.message || '删除失败');
+      return;
+    }
+
+    alert('品物删除成功！');
+    
+    // 前端过滤该品物并重新渲染
+    customItems = customItems.filter(item => item.id !== itemId);
+    renderCards();
+
+  } catch (error) {
+    alert(`删除请求失败，网络异常: ${error.message}`);
   }
 }
 

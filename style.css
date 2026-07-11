@@ -545,6 +545,39 @@ header {
   color: #ff7da9;
 }
 
+/* 卡片删除按钮样式 */
+.card-delete-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(8, 9, 12, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: var(--transition-smooth);
+}
+
+.card-delete-btn:hover {
+  background: rgba(255, 42, 133, 0.2);
+  border-color: rgba(255, 42, 133, 0.4);
+  color: #ff5e97;
+  box-shadow: 0 0 12px rgba(255, 42, 133, 0.4);
+  transform: scale(1.08);
+}
+
+.card-delete-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 /* ==========================================
    6. 极致手机端深度适配 (Media Queries 必须放最末尾以确保覆盖优先级)
    ========================================== */
