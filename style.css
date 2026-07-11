@@ -1,22 +1,24 @@
 /* ==========================================
-   1. 导入字体与全局变量定义
+   1. 导入高端字体与全局设计系统变量
    ========================================== */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Serif+SC:wght@300;600;900&display=swap');
 
 :root {
-  --bg-color: #0d0e12;
-  --panel-bg: rgba(255, 255, 255, 0.03);
-  --panel-border: rgba(255, 255, 255, 0.07);
+  --bg-color: #080607; /* 极致黑巧色 */
+  --panel-bg: rgba(255, 255, 255, 0.02);
+  --panel-border: rgba(255, 255, 255, 0.06);
   --text-main: #f5f5f7;
-  --text-muted: #9a9ab0;
-  --accent-cooking: #d4af37; /* 香槟金 */
-  --accent-cooking-glow: rgba(212, 175, 55, 0.2);
-  --accent-bartending: #ff2a85; /* 霓虹粉 */
-  --accent-bartending-glow: rgba(255, 42, 133, 0.25);
-  --glass-blur: blur(16px);
-  --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  --border-radius-lg: 24px;
-  --border-radius-md: 16px;
+  --text-muted: #a69ea1;
+  --accent-cooking: #e67e22; /* 焦糖暖橘 */
+  --accent-cooking-glow: rgba(230, 126, 34, 0.18);
+  --accent-bartending: #d4af37; /* 香槟金 */
+  --accent-bartending-glow: rgba(212, 175, 55, 0.15);
+  --accent-tasting: #c0392b; /* 红酒深红 */
+  --accent-tasting-glow: rgba(192, 57, 43, 0.2);
+  --glass-blur: blur(20px);
+  --transition-smooth: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  --border-radius-lg: 28px;
+  --border-radius-md: 18px;
 }
 
 * {
@@ -26,55 +28,370 @@
 }
 
 body {
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Outfit', 'Noto Serif SC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.6;
   overflow-x: hidden;
+  /* 暖调食欲色彩渐变底影 */
   background-image: 
-    radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(255, 42, 133, 0.05) 0%, transparent 40%);
+    radial-gradient(circle at 15% 15%, rgba(230, 126, 34, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 85% 85%, rgba(192, 57, 43, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 60%);
   background-attachment: fixed;
 }
 
 /* ==========================================
-   2. 头部导航与标题
+   2. SPA 视口切换框架 (View Containers)
    ========================================== */
-header {
-  padding: 2.5rem 2rem 1.5rem 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
+.view-container {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+  transition: var(--transition-smooth);
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+  visibility: hidden;
 }
 
-.logo-section {
-  text-align: center;
-}
-
-.logo-section h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #fff 30%, #a5a5b0 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 0.25rem;
-}
-
-.logo-section p {
-  color: var(--text-muted);
-  font-size: 1rem;
-  font-weight: 300;
-  letter-spacing: 1px;
+.view-container.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+  position: relative; /* 撑开 body 滚动 */
 }
 
 /* ==========================================
-   3. 主控制器区域（过滤分类 + 添加按钮）
+   3. 首页设计 (Home View)
    ========================================== */
+.user-status-bar-home {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  z-index: 20;
+}
+
+.home-hero-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 2rem;
+  gap: 3.5rem;
+}
+
+.hero-brand {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-title {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: 4.5rem;
+  letter-spacing: 8px;
+  background: linear-gradient(135deg, #ffffff 10%, #e67e22 60%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  margin-right: -8px; /* 抵消字间距 */
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 4px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.hero-divider {
+  display: block;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-bartending), transparent);
+  margin: 1.5rem 0;
+}
+
+.hero-tagline {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 300;
+  font-size: 1.25rem;
+  color: #d1cbd0;
+  letter-spacing: 1px;
+}
+
+/* 首页双分类导航卡片 */
+.nav-cards-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  width: 100%;
+  max-width: 1050px;
+}
+
+.nav-card {
+  height: 380px;
+  border-radius: var(--border-radius-lg);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.nav-card-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  /* 初始变暗且稍微褪色，突出神秘感 */
+  filter: brightness(0.35) saturate(0.8);
+  transition: var(--transition-smooth);
+  z-index: 1;
+}
+
+.nav-card-content {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 3rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: linear-gradient(0deg, rgba(8, 6, 7, 0.9) 10%, rgba(8, 6, 7, 0.2) 60%, transparent 100%);
+}
+
+.nav-card-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--accent-bartending);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+#enterTastingsBtn .nav-card-badge {
+  color: var(--accent-cooking);
+}
+
+.nav-card h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 600;
+  font-size: 2.2rem;
+  margin-bottom: 0.75rem;
+  color: #fff;
+}
+
+.nav-card p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 300;
+  max-width: 90%;
+  margin-bottom: 1.5rem;
+}
+
+.enter-arrow {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  transition: var(--transition-smooth);
+}
+
+.enter-arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* 首页卡片 Hover 动效 - 诱人食欲的色彩苏醒 */
+.nav-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+#enterCreationsBtn:hover {
+  box-shadow: 0 30px 60px rgba(212, 175, 55, 0.12), 0 0 1px var(--accent-bartending);
+}
+
+#enterTastingsBtn:hover {
+  box-shadow: 0 30px 60px rgba(230, 126, 34, 0.15), 0 0 1px var(--accent-cooking);
+}
+
+.nav-card:hover .nav-card-bg {
+  transform: scale(1.06);
+  /* 悬停时亮度提升，色彩饱满诱人 */
+  filter: brightness(0.6) saturate(1.15);
+}
+
+.nav-card:hover .enter-arrow {
+  background: #fff;
+  color: var(--bg-color);
+  transform: translateX(6px);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+
+/* ==========================================
+   4. 子页面头部面包屑与导航 (Sub Page Header)
+   ========================================== */
+.sub-header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem 2rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.nav-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-smooth);
+}
+
+.back-btn:hover {
+  color: var(--text-main);
+  transform: translateX(-4px);
+}
+
+.back-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.breadcrumb-current {
+  color: var(--text-main);
+  font-weight: 400;
+}
+
+.sub-logo-section {
+  text-align: left;
+}
+
+.sub-logo-section h2 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 900;
+  font-size: 2.8rem;
+  letter-spacing: 2px;
+  color: #fff;
+  margin-bottom: 0.25rem;
+}
+
+.sub-logo-section p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 300;
+}
+
+/* ==========================================
+   5. 状态栏与控制栏布局
+   ========================================== */
+.user-status-bar {
+  position: absolute;
+  top: 3rem;
+  right: 2rem;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.auth-trigger-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  color: var(--text-main);
+  padding: 8px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  font-family: inherit;
+  backdrop-filter: var(--glass-blur);
+}
+
+.auth-trigger-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.user-info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 4px 6px 4px 16px;
+  border-radius: 30px;
+  border: 1px solid var(--panel-border);
+  backdrop-filter: var(--glass-blur);
+}
+
+.username-display {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.logout-btn {
+  background: rgba(230, 126, 34, 0.08);
+  border: 1px solid rgba(230, 126, 34, 0.15);
+  color: #f39c12;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  font-family: inherit;
+}
+
+.logout-btn:hover {
+  background: rgba(230, 126, 34, 0.18);
+  border-color: rgba(230, 126, 34, 0.35);
+  color: #ffb84d;
+}
+
+/* 控制器区域（过滤分类 + 添加按钮） */
 .controls-container {
   width: 100%;
   max-width: 1200px;
@@ -115,11 +432,12 @@ header {
 }
 
 .tab-btn.active {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   color: var(--text-main);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* 霓虹添加按钮 (随分类改变发光) */
 .add-btn {
   background: linear-gradient(135deg, var(--accent-cooking) 0%, var(--accent-bartending) 100%);
   border: none;
@@ -129,7 +447,7 @@ header {
   font-weight: 600;
   border-radius: 40px;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(255, 42, 133, 0.3);
+  box-shadow: 0 4px 20px rgba(230, 126, 34, 0.25);
   transition: var(--transition-smooth);
   display: flex;
   align-items: center;
@@ -139,7 +457,7 @@ header {
 
 .add-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 42, 133, 0.45);
+  box-shadow: 0 8px 25px rgba(230, 126, 34, 0.4);
 }
 
 .add-btn svg {
@@ -149,7 +467,7 @@ header {
 }
 
 /* ==========================================
-   4. 卡片展示网格
+   6. 卡片展示网格与玻璃卡片
    ========================================== */
 .grid-section {
   max-width: 1200px;
@@ -160,7 +478,7 @@ header {
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 .item-card {
@@ -177,10 +495,11 @@ header {
 
 .item-card:hover {
   transform: translateY(-6px);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
+/* 卡片不同类别的阴影光效 */
 .item-card.cooking:hover {
   box-shadow: 0 20px 40px var(--accent-cooking-glow), 0 0 1px var(--accent-cooking);
 }
@@ -204,7 +523,7 @@ header {
 }
 
 .item-card:hover .card-img-wrapper img {
-  transform: scale(1.06);
+  transform: scale(1.05);
 }
 
 .card-badge {
@@ -223,26 +542,27 @@ header {
 }
 
 .cooking .card-badge {
-  background: rgba(212, 175, 55, 0.25);
+  background: rgba(230, 126, 34, 0.25);
   text-shadow: 0 0 8px var(--accent-cooking);
 }
 
 .bartending .card-badge {
-  background: rgba(255, 42, 133, 0.25);
+  background: rgba(212, 175, 55, 0.25);
   text-shadow: 0 0 8px var(--accent-bartending);
 }
 
 .card-body {
-  padding: 1.5rem;
+  padding: 1.75rem;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.2) 100%);
 }
 
 .card-title {
   font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
   color: var(--text-main);
   transition: var(--transition-smooth);
 }
@@ -264,6 +584,39 @@ header {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 0.5rem;
+}
+
+.card-delete-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(8, 9, 12, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: var(--transition-smooth);
+}
+
+.card-delete-btn:hover {
+  background: rgba(192, 57, 43, 0.25);
+  border-color: rgba(192, 57, 43, 0.5);
+  color: #ff6b6b;
+  box-shadow: 0 0 12px var(--accent-tasting-glow);
+  transform: scale(1.08);
+}
+
+.card-delete-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .empty-state {
@@ -275,7 +628,7 @@ header {
 }
 
 /* ==========================================
-   5. 模态框与表单
+   7. 模态框与表单
    ========================================== */
 .modal {
   position: fixed;
@@ -283,8 +636,8 @@ header {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(8, 9, 12, 0.85);
-  backdrop-filter: blur(20px);
+  background: rgba(8, 6, 7, 0.88);
+  backdrop-filter: blur(25px);
   z-index: 100;
   display: flex;
   justify-content: center;
@@ -300,14 +653,14 @@ header {
 }
 
 .modal-content {
-  background: #14161f;
+  background: #120e10;
   border: 1px solid var(--panel-border);
   width: 100%;
   max-width: 500px;
   border-radius: var(--border-radius-lg);
   padding: 2.5rem;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-  transform: scale(0.95) translateY(10px);
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.6);
+  transform: scale(0.95) translateY(12px);
   transition: var(--transition-smooth);
   position: relative;
 }
@@ -338,8 +691,9 @@ header {
 }
 
 .modal h2 {
+  font-family: 'Noto Serif SC', serif;
   font-size: 1.8rem;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 1.5rem;
   letter-spacing: -0.5px;
 }
@@ -362,8 +716,8 @@ header {
 .form-group textarea,
 .form-group select {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: var(--border-radius-md);
   padding: 12px 16px;
   color: var(--text-main);
@@ -376,15 +730,15 @@ header {
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .file-upload-wrapper {
   position: relative;
   width: 100%;
   height: 120px;
-  border: 2px dashed rgba(255, 255, 255, 0.12);
+  border: 2px dashed rgba(255, 255, 255, 0.1);
   border-radius: var(--border-radius-md);
   display: flex;
   flex-direction: column;
@@ -395,7 +749,7 @@ header {
 }
 
 .file-upload-wrapper:hover {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.25);
   background: rgba(255, 255, 255, 0.02);
 }
 
@@ -444,8 +798,8 @@ header {
 
 .btn-secondary {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   color: var(--text-main);
   padding: 12px;
   border-radius: 30px;
@@ -457,7 +811,7 @@ header {
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .btn-primary {
@@ -472,147 +826,98 @@ header {
   cursor: pointer;
   transition: var(--transition-smooth);
   font-family: inherit;
-  box-shadow: 0 4px 15px rgba(255, 42, 133, 0.25);
+  box-shadow: 0 4px 15px rgba(230, 126, 34, 0.25);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 20px rgba(255, 42, 133, 0.4);
-}
-
-/* 用户状态栏与登录组件样式 */
-.user-status-bar {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-}
-
-.auth-trigger-btn {
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  color: var(--text-main);
-  padding: 8px 18px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-  font-family: inherit;
-  backdrop-filter: var(--glass-blur);
-}
-
-.auth-trigger-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.user-info-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  padding: 4px 6px 4px 16px;
-  border-radius: 30px;
-  border: 1px solid var(--panel-border);
-  backdrop-filter: var(--glass-blur);
-}
-
-.username-display {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-.logout-btn {
-  background: rgba(255, 42, 133, 0.1);
-  border: 1px solid rgba(255, 42, 133, 0.2);
-  color: #ff5e97;
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-  font-family: inherit;
-}
-
-.logout-btn:hover {
-  background: rgba(255, 42, 133, 0.2);
-  border-color: rgba(255, 42, 133, 0.4);
-  color: #ff7da9;
-}
-
-/* 卡片删除按钮样式 */
-.card-delete-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 5;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(8, 9, 12, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: var(--transition-smooth);
-}
-
-.card-delete-btn:hover {
-  background: rgba(255, 42, 133, 0.2);
-  border-color: rgba(255, 42, 133, 0.4);
-  color: #ff5e97;
-  box-shadow: 0 0 12px rgba(255, 42, 133, 0.4);
-  transform: scale(1.08);
-}
-
-.card-delete-btn svg {
-  width: 18px;
-  height: 18px;
+  box-shadow: 0 6px 20px rgba(230, 126, 34, 0.35);
 }
 
 /* ==========================================
-   6. 极致手机端深度适配 (Media Queries 必须放最末尾以确保覆盖优先级)
+   8. 极致手机端深度适配 (Media Queries)
    ========================================== */
 @media (max-width: 768px) {
-  header {
+  .user-status-bar-home {
+    position: static;
+    margin-top: 1.5rem;
+    margin-bottom: -1rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .home-hero-section {
+    padding: 3rem 1.25rem;
+    justify-content: flex-start;
+    gap: 2.5rem;
+  }
+
+  .hero-title {
+    font-size: 3.2rem;
+    letter-spacing: 5px;
+  }
+
+  .hero-tagline {
+    font-size: 1rem;
+    padding: 0 1rem;
+  }
+
+  .nav-cards-container {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+
+  .nav-card {
+    height: 260px;
+  }
+
+  .nav-card-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .nav-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .nav-card p {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  /* 子页面部分 */
+  .sub-header {
     padding: 2rem 1rem 1rem 1rem;
   }
-  
-  .logo-section h1 {
+
+  .sub-logo-section h2 {
     font-size: 2.1rem;
   }
-  
-  .logo-section p {
-    font-size: 0.9rem;
+
+  .user-status-bar {
+    position: static;
+    margin-bottom: 1.5rem;
+    justify-content: center;
+    width: 100%;
+    order: -1;
   }
-  
-  /* 头部控制器布局优化：给底部悬浮按钮让路 */
+
   .controls-container {
     padding: 0 1rem 1.5rem 1rem;
     justify-content: center;
   }
-  
+
   .filter-tabs {
     width: 100%;
     justify-content: space-around;
   }
-  
+
   .tab-btn {
     flex: 1;
     text-align: center;
-    padding: 8px 12px;
-    font-size: 0.9rem;
+    padding: 8px 10px;
+    font-size: 0.85rem;
   }
-  
-  /* 手机端转化为：右下角极具质感的悬浮添加按钮 (Floating Action Button) */
+
   .add-btn {
     position: fixed;
     bottom: 28px;
@@ -624,31 +929,29 @@ header {
     padding: 0;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 8px 30px rgba(255, 42, 133, 0.45);
-    /* 隐藏文字，只留加号图标 */
+    box-shadow: 0 8px 30px rgba(230, 126, 34, 0.45);
     font-size: 0;
   }
-  
+
   .add-btn svg {
     width: 24px;
     height: 24px;
     margin: 0;
   }
-  
+
   .grid-section {
-    padding: 0 1rem 5rem 1rem; /* 底部增加 padding 避免卡片内容被悬浮按钮遮挡 */
+    padding: 0 1rem 5rem 1rem;
   }
-  
+
   .cards-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
-  /* 手机端模态框优化：改用抽屉式底部滑出设计，防内容截断，支持平滑滚动 */
+
   .modal {
     align-items: flex-end;
   }
-  
+
   .modal-content {
     width: 100%;
     max-width: 100%;
@@ -656,40 +959,26 @@ header {
     padding: 2rem 1.5rem 3rem 1.5rem;
     border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
     border-bottom: none;
-    max-height: 88vh; /* 限制最大高度，留出顶部边缘以示仍是模态框 */
-    overflow-y: auto; /* 允许超出时在内部滚动 */
-    -webkit-overflow-scrolling: touch; /* iOS 惯性滚动 */
+    max-height: 88vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     transform: translateY(100%);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  
+
   .modal.active .modal-content {
     transform: translateY(0);
   }
-  
+
   .modal-close {
     top: 20px;
     right: 20px;
   }
-  
-  /* 解决 iOS 浏览器上输入框字体小于 16px 导致聚焦自动放大的问题 */
+
   .form-group input[type="text"],
   .form-group textarea,
   .form-group select {
     font-size: 16px;
-    padding: 14px 16px; /* 适当增大触控大小 */
-  }
-  
-  .file-upload-wrapper {
-    height: 110px;
-  }
-  
-  /* 移动端用户状态栏微调 */
-  .user-status-bar {
-    position: static;
-    margin-bottom: 1.5rem;
-    justify-content: center;
-    width: 100%;
-    order: -1; /* 在 Flexbox 中使其排在标题最上方 */
+    padding: 14px 16px;
   }
 }

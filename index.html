@@ -3,51 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gourmet & Mixology | 美食与调酒空间</title>
+  <title>尋味記 | The Gastronomy Chronicle</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- 头部导航与标题 -->
-  <header>
-    <!-- 用户状态及登录按钮 -->
-    <div class="user-status-bar" id="userStatusBar">
-      <button class="auth-trigger-btn" id="openAuthModalBtn">管理员登录</button>
-      <div class="user-info-wrapper" id="userInfoWrapper" style="display: none;">
-        <span class="username-display" id="usernameDisplay"></span>
-        <button class="logout-btn" id="logoutBtn">退出</button>
+  <!-- 1. 首页入口大厅 (Home View) -->
+  <div class="view-container active" id="homeView">
+    <!-- 右上角登录状态栏 -->
+    <div class="user-status-bar-home">
+      <button class="auth-trigger-btn" id="openAuthModalBtnHome">管理员登录</button>
+      <div class="user-info-wrapper" id="userInfoWrapperHome" style="display: none;">
+        <span class="username-display" id="usernameDisplayHome"></span>
+        <button class="logout-btn" id="logoutBtnHome">退出</button>
       </div>
     </div>
-    
-    <div class="logo-section">
-      <h1>Gourmet & Mixology</h1>
-      <p>美食与调酒的精致品物空间</p>
-    </div>
-  </header>
 
-  <!-- 控制器区域：分类与添加按钮 -->
-  <div class="controls-container">
-    <div class="filter-tabs">
-      <button class="tab-btn active" data-filter="all">全部品类</button>
-      <button class="tab-btn" data-filter="cooking">精选美食</button>
-      <button class="tab-btn" data-filter="bartending">创意调酒</button>
+    <!-- 首页视觉巨幕 -->
+    <div class="home-hero-section">
+      <div class="hero-brand">
+        <h1 class="hero-title">尋味記</h1>
+        <p class="hero-subtitle">The Gastronomy & Mixology Chronicle</p>
+        <span class="hero-divider"></span>
+        <p class="hero-tagline">记录每一道亲手调制的温存，与每一次在街角偶遇的惊艳</p>
+      </div>
+
+      <!-- 双大分类导航卡片 -->
+      <div class="nav-cards-container">
+        <!-- 入口 A：手作风味 -->
+        <div class="nav-card" id="enterCreationsBtn">
+          <div class="nav-card-bg" style="background-image: url('images/gourmet_dish.jpg');"></div>
+          <div class="nav-card-content">
+            <span class="nav-card-badge">Creations</span>
+            <h2>手作风味</h2>
+            <p>记录我亲手烹煮的食物与调配的酒水，那份专注的温度</p>
+            <span class="enter-arrow">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <!-- 入口 B：探店寻味 -->
+        <div class="nav-card" id="enterTastingsBtn">
+          <div class="nav-card-bg" style="background-image: url('images/tasting_steak.jpg');"></div>
+          <div class="nav-card-content">
+            <span class="nav-card-badge">Tastings</span>
+            <h2>探店寻味</h2>
+            <p>记录我在外界品尝到的精美菜肴与醇香酒浆，那一瞬的惊艳</p>
+            <span class="enter-arrow">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <!-- 仅在登录后显示的添加按钮，默认隐藏 -->
-    <button class="add-btn" id="openModalBtn" style="display: none;">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-      </svg>
-      添加品物
-    </button>
   </div>
 
-  <!-- 卡片展示网格 -->
-  <main class="grid-section">
-    <div class="cards-grid" id="cardsGrid">
-      <!-- 卡片由 app.js 动态渲染 -->
+  <!-- 2. 子列表页面视口 (List View - 共享自制与品尝) -->
+  <div class="view-container" id="listView">
+    <!-- 子页面头部面包屑与导航 -->
+    <header class="sub-header">
+      <div class="nav-breadcrumb">
+        <button class="back-btn" id="backToHomeBtn">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          返回首页
+        </button>
+        <span class="breadcrumb-separator">/</span>
+        <span class="breadcrumb-current" id="breadcrumbCurrent">手作风味</span>
+      </div>
+      
+      <!-- 右上角用户状态栏 -->
+      <div class="user-status-bar" id="userStatusBar">
+        <button class="auth-trigger-btn" id="openAuthModalBtn">管理员登录</button>
+        <div class="user-info-wrapper" id="userInfoWrapper" style="display: none;">
+          <span class="username-display" id="usernameDisplay"></span>
+          <button class="logout-btn" id="logoutBtn">退出</button>
+        </div>
+      </div>
+
+      <div class="sub-logo-section">
+        <h2 id="subPageTitle">手作风味</h2>
+        <p id="subPageDesc">记录我亲手烹煮的食物与调配的酒汁</p>
+      </div>
+    </header>
+
+    <!-- 控制器区域：分类与添加按钮 -->
+    <div class="controls-container">
+      <div class="filter-tabs">
+        <button class="tab-btn active" data-filter="all">全部品类</button>
+        <button class="tab-btn" data-filter="cooking">精选美食</button>
+        <button class="tab-btn" data-filter="bartending">创意调酒</button>
+      </div>
+      
+      <!-- 仅在登录后显示的添加按钮 -->
+      <button class="add-btn" id="openModalBtn" style="display: none;">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        添加品物
+      </button>
     </div>
-  </main>
+
+    <!-- 卡片网格展示区 -->
+    <main class="grid-section">
+      <div class="cards-grid" id="cardsGrid">
+        <!-- 卡片动态渲染 -->
+      </div>
+    </main>
+  </div>
 
   <!-- 添加品物的模态框 (Modal) -->
   <div class="modal" id="addModal">
@@ -58,7 +127,7 @@
         </svg>
       </button>
       
-      <h2>添加新卡片</h2>
+      <h2 id="addModalTitle">添加新卡片</h2>
       
       <form id="addForm">
         <!-- 类别选择 -->
