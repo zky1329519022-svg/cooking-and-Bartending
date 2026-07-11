@@ -5,16 +5,8 @@
 // 自制（手作风味）预设数据 (已按要求清空)
 const INITIAL_CREATION_ITEMS = [];
 
-// 品尝（探店寻味）预设数据
-const INITIAL_TASTING_ITEMS = [
-  {
-    id: 'default-tasting-1',
-    name: '法式酥皮惠灵顿牛排',
-    type: 'cooking',
-    description: '精选安格斯牛柳，包裹细腻的松露蘑菇酱和帕尔玛火腿。外层金黄酥皮网格烤制得恰到好处，切开后牛肉呈现粉嫩的五分熟，肉汁丰盈，酥脆与鲜嫩交织。',
-    image: 'images/tasting_steak.jpg'
-  }
-];
+// 品尝（探店寻味）预设数据 (已按要求清空)
+const INITIAL_TASTING_ITEMS = [];
 
 // ==========================================
 // 2. DOM 元素选择
