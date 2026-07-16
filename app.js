@@ -244,10 +244,13 @@ function renderCards() {
       </button>
     ` : '';
 
+    // 确定图片真实路径（兼容旧数据的 Base64 与新数据的 /api/image 云端强缓存接口）
+    const imgSrc = item.image === 'kv' ? `/api/image?id=${item.id}` : item.image;
+
     card.innerHTML = `
       <div class="card-img-wrapper">
         <span class="card-badge">${typeLabel}</span>
-        <img src="${item.image}" alt="${item.name}" loading="lazy">
+        <img src="${imgSrc}" alt="${item.name}" loading="lazy">
         ${deleteBtnHtml}
       </div>
       <div class="card-body">
@@ -592,8 +595,8 @@ function openDetailModal(itemId) {
 
   if (!item) return;
 
-  // 渲染填充详情
-  detailImage.src = item.image;
+  // 渲染填充详情 (做同样的新旧图片地址兼容处理)
+  detailImage.src = item.image === 'kv' ? `/api/image?id=${item.id}` : item.image;
   detailTitle.textContent = item.name;
   detailDescription.textContent = item.description;
 

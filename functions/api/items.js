@@ -75,13 +75,16 @@ export async function onRequestPost(context) {
     const itemCategory = category || 'creations';
     const kvKey = getKvKey(itemCategory);
 
-    // 3. 构建新对象
+    // 3. 构建新对象，把图片数据独立拆分存储，防止大体积 JSON 导致国内网络超时阻断
+    const itemId = `custom-${Date.now()}`;
+    await env.ITEMS_KV.put(`image:${itemId}`, image);
+
     const newItem = {
-      id: `custom-${Date.now()}`,
+      id: itemId,
       name: name.trim(),
       type,
       description: description.trim(),
-      image, // Base64 格式
+      image: "kv", // 占位符，图片走独立分发路由以支持浏览器强缓存，从根本解决国内不连 VPN 慢的问题
       createdBy: username,
       createdAt: new Date().toISOString()
     };
@@ -144,8 +147,13 @@ export async function onRequestDelete(context) {
       return jsonResponse({ success: false, message: "未找到该品物或该品物不支持删除" }, 404);
     }
 
-    // 4. 写回云端 KV
+    // 4. 写回云端 KV，并同步删除已剥离的图片大文件
     await env.ITEMS_KV.put(kvKey, JSON.stringify(items));
+    try {
+      await env.ITEMS_KV.delete(`image:${itemId}`);
+    } catch (err) {
+      console.warn(`Associated image: ${itemId} cleanup failed: ${err.message}`);
+    }
 
     return jsonResponse({ success: true, message: "品物已成功从云端删除" });
 
